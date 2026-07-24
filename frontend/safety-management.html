@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AeroInspect AI | Safety Management</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { primary: '#059669', 'primary-dark': '#047857', 'on-surface': '#191c1e', 'on-surface-variant': '#3d4a42', outline: '#6d7a72', 'outline-variant': '#bccac0', bg: '#f7f9fc', error: '#ba1a1a', tertiary: '#b15f00' },
+    fontFamily: { headline: ['Plus Jakarta Sans'], body: ['Inter'], mono: ['JetBrains Mono'] }
+  }}}
+</script>
+<style>.drag-active{border-color:#059669;background:rgba(5,150,105,0.05);}</style>
+</head>
+<body class="bg-bg text-on-surface font-body">
+<aside class="w-[240px] h-screen fixed left-0 top-0 bg-[#2d3b45] flex flex-col py-6 z-50">
+  <div class="px-6 mb-8"><h1 class="font-headline text-xl font-bold text-white">AeroInspect AI</h1><p class="text-[11px] text-white/50 uppercase tracking-widest mt-1">Enterprise Hub</p></div>
+  <nav class="flex-1 px-3 space-y-1">
+<a href="index.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="inspections.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Live Monitoring</a>
+    <a href="cameras.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Cameras</a>
+    <a href="sites.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3 21h18M5 21V7l8-4v18M13 21V11l6 3v7"/></svg>Sites</a>
+    <a href="workers.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Workers</a>
+    <a href="alerts.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Alerts</a>
+    <a href="safety-management.html" class="flex items-center gap-3 px-4 py-3 border-l-4 border-primary bg-primary/10 text-primary font-bold rounded-r-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Safety Management</a>
+    <a href="reports.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Reports</a>
+    <a href="analytics.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Analytics</a>
+    <a href="users.html" data-admin-only="true" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Users</a>
+    <a href="settings.html" data-admin-only="true" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  </nav>
+  <div class="px-6 pt-6 mt-auto border-t border-white/10 flex items-center gap-3" id="sidebar-user"></div>
+</aside>
+<main class="ml-[240px] min-h-screen relative">
+  <header class="h-16 fixed top-0 right-0 w-[calc(100%-240px)] z-40 bg-white/80 backdrop-blur-md border-b border-outline-variant/10 flex justify-between items-center px-8">
+    <div class="relative w-96">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input id="global-search" placeholder="Search safety records..." autocomplete="off" class="w-full bg-[#f2f4f7] border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/30 outline-none">
+      <div id="search-results" class="hidden absolute top-11 left-0 right-0 bg-white border border-outline-variant/20 rounded-xl shadow-xl max-h-80 overflow-y-auto z-50"></div>
+    </div>
+    <div id="user-badge" class="flex items-center gap-3"></div>
+  </header>
+  <div class="pt-16">
+    <section class="relative h-[180px] overflow-hidden">
+      <div class="absolute inset-0 bg-cover bg-center" style="background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1600&q=80')"></div>
+      <div class="absolute inset-0 bg-primary/30 backdrop-blur-sm"></div>
+      <div class="relative h-full px-8 flex flex-col justify-end pb-6 text-white">
+        <p class="text-xs uppercase tracking-widest opacity-80 mb-1">Compliance & Standards</p>
+        <h2 class="font-headline text-2xl font-bold">Safety Management</h2>
+      </div>
+    </section>
+    <div class="p-8 grid grid-cols-3 gap-6">
+      <div class="col-span-2 bg-white rounded-xl p-6 shadow-sm border border-outline-variant/10">
+        <h3 class="font-headline text-lg font-bold mb-4">Upload Safety Manual</h3>
+        <form id="upload-form" onsubmit="submitManual(event)">
+   <div class="grid grid-cols-2 gap-4 mb-4">
+            <div><label class="block text-xs font-semibold text-outline mb-1.5 uppercase">Manual Name</label><input id="manual-name" required placeholder="e.g. OSHA Site Protocol" class="w-full px-4 py-2.5 bg-[#f2f4f7] border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none"></div>
+            <div><label class="block text-xs font-semibold text-outline mb-1.5 uppercase">Organization</label><input id="manual-org" placeholder="AeroInspect Global" class="w-full px-4 py-2.5 bg-[#f2f4f7] border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none"></div>
+            <div><label class="block text-xs font-semibold text-outline mb-1.5 uppercase">Region</label><input id="manual-region" placeholder="e.g. India" class="w-full px-4 py-2.5 bg-[#f2f4f7] border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none"></div>
+            <div><label class="block text-xs font-semibold text-outline mb-1.5 uppercase">Version</label><input id="manual-version" placeholder="v1.0" class="w-full px-4 py-2.5 bg-[#f2f4f7] border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none"></div>
+          </div>
+          <label id="file-drop" for="file-input" class="border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center p-10 hover:border-primary hover:bg-primary/5 cursor-pointer transition-all">
+            <span class="text-3xl mb-2">☁️</span>
+            <p class="font-semibold text-sm">Click to upload or drag and drop</p>
+            <p class="text-xs text-outline">PDF or DOCX (Max 50MB)</p>
+          </label>
+          <input type="file" id="file-input" accept=".pdf,.docx" class="hidden" onchange="handleFileSelect(this)">
+          <div class="flex justify-end mt-4"><button type="submit" class="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-dark transition-colors">Upload Manual</button></div>
+        </form>
+      </div>
+      <div class="bg-primary text-white rounded-xl p-6 flex flex-col justify-between">
+        <div><h4 class="font-headline text-lg font-bold mb-3">Manual Verification</h4><p class="text-sm opacity-90 mb-4">Each uploaded manual is processed to power the AI rule-matching engine.</p>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">✓ Automated Rule Matching</li>
+            <li class="flex items-center gap-2">✓ Severity-Based Scoring</li>
+            <li class="flex items-center gap-2">✓ Single Active Manual per Site</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-span-3 bg-white rounded-xl shadow-sm border border-outline-variant/10 overflow-hidden">
+        <div class="px-6 py-4 border-b border-outline-variant/10"><h3 class="font-headline text-lg font-bold">Uploaded Manuals</h3></div>
+        <table class="w-full text-left">
+          <thead class="bg-[#f2f4f7]"><tr>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider">Manual</th>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider">Uploaded</th>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider text-right">Actions</th>
+          </tr></thead>
+          <tbody id="manuals-body" class="divide-y divide-outline-variant/10"></tbody>
+        </table>
+        <div id="manuals-empty" class="hidden text-center py-8 text-outline text-sm">No manuals uploaded yet.</div>
+      </div>
+
+      <div class="col-span-3 bg-white rounded-xl shadow-sm border border-outline-variant/10 overflow-hidden">
+        <div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center">
+          <div>
+            <h3 class="font-headline text-lg font-bold">🤖 Active Safety Rules</h3>
+            <p class="text-xs text-outline mt-1">Rules currently driving real-time violation detection, extracted from your active manual.</p>
+          </div>
+          <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full" id="rules-count-badge">— rules</span>
+        </div>
+        <table class="w-full text-left">
+          <thead class="bg-[#f2f4f7]"><tr>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider">Category</th>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider">Rule</th>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider">Severity</th>
+            <th class="px-6 py-3 text-xs text-outline uppercase tracking-wider">Condition Type</th>
+          </tr></thead>
+          <tbody id="rules-body" class="divide-y divide-outline-variant/10"></tbody>
+        </table>
+        <div id="rules-empty" class="hidden text-center py-8 text-outline text-sm">No rules from the active manual yet — upload a PDF and click "🤖 Extract Rules" above.</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="js/api.js"></script><script src="js/auth.js"></script><script src="js/search.js"></script><script src="js/safety-management.js"></script>
+</body></html>

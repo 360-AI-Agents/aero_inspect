@@ -1,0 +1,30 @@
+.report-select-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.report-select-row .field { flex: 1; margin-bottom: 0; }
+
+.report-body { display: none; }
+.report-body.open { display: block; }
+
+.report-summary {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.report-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  margin-bottom: 16px;
+}

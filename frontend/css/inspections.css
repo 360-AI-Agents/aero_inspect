@@ -1,0 +1,111 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn {
+  background: var(--accent);
+  color: #06110B;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover { opacity: 0.9; }
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.inspection-row { cursor: pointer; }
+
+.detail-panel {
+  display: none;
+  margin-top: 20px;
+}
+
+.detail-panel.open { display: block; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.detail-stat {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.detail-stat-label { font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px; }
+.detail-stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; }
+
+.violation-list { display: flex; flex-direction: column; gap: 8px; }
+
+.violation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.severity-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: capitalize;
+}
+
+.severity-low { background: rgba(124,138,153,0.15); color: var(--text-muted); }
+.severity-medium { background: rgba(251,191,36,0.15); color: var(--warning); }
+.severity-high, .severity-critical { background: var(--danger-dim); color: var(--danger); }
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  width: 380px;
+}
+
+.modal h2 { font-size: 16px; margin-bottom: 16px; }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px; }
+.field input, .field select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.modal-actions { display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end; }

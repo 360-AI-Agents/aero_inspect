@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AeroInspect AI | Alerts</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { primary: '#059669', 'primary-dark': '#047857', 'on-surface': '#191c1e', 'on-surface-variant': '#3d4a42', outline: '#6d7a72', 'outline-variant': '#bccac0', bg: '#f7f9fc', error: '#ba1a1a', tertiary: '#b15f00' },
+    fontFamily: { headline: ['Plus Jakarta Sans'], body: ['Inter'], mono: ['JetBrains Mono'] }
+  }}}
+</script>
+<style>
+  .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+  .collapse-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+  .collapse-open .collapse-content { max-height: 3000px; }
+  .collapse-open .chevron { transform: rotate(180deg); }
+  .map-pin-tooltip { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .map-pin:hover .map-pin-tooltip { opacity: 1; }
+</style>
+</head>
+<body class="bg-bg text-on-surface font-body">
+<aside class="w-[240px] h-screen fixed left-0 top-0 bg-[#2d3b45] flex flex-col py-6 z-50">
+  <div class="px-6 mb-8 flex items-center gap-3">
+    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <div><h1 class="font-headline text-lg font-bold text-white leading-none">AeroInspect AI</h1><p class="text-[11px] text-white/50 mt-1">Enterprise Hub</p></div>
+  </div>
+  <nav class="flex-1 px-3 space-y-1">
+    <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="inspections.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Live Monitoring</a>
+    <a href="cameras.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Cameras</a>
+    <a href="sites.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3 21h18M5 21V7l8-4v18M13 21V11l6 3v7"/></svg>Sites</a>
+    <a href="workers.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Workers</a>
+    <a href="alerts.html" class="flex items-center gap-3 px-4 py-3 border-l-4 border-primary bg-primary/10 text-primary font-bold rounded-r-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Alerts</a>
+    <a href="safety-management.html" data-admin-only="true" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Safety Management</a>
+    <a href="reports.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Reports</a>
+    <a href="analytics.html" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Analytics</a>
+    <a href="users.html" data-admin-only="true" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Users</a>
+    <a href="settings.html" data-admin-only="true" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+  </nav>
+  <div class="px-6 pt-6 mt-auto border-t border-white/10">
+    <div class="flex items-center gap-3" id="user-badge-sidebar"></div>
+  </div>
+  <div class="px-6 pt-6 mt-auto border-t border-white/10 flex items-center gap-3" id="sidebar-user"></div>
+</aside>
+<main class="ml-[240px] min-h-screen relative">
+  <header class="h-16 fixed top-0 right-0 w-[calc(100%-240px)] z-40 bg-white/80 backdrop-blur-md border-b border-outline-variant/10 flex justify-between items-center px-8">
+    <div class="relative w-96">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input id="global-search" placeholder="Search alerts, sites, or personnel..." autocomplete="off" class="w-full bg-[#f2f4f7] border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/30 outline-none">
+      <div id="search-results" class="hidden absolute top-11 left-0 right-0 bg-white border border-outline-variant/20 rounded-xl shadow-xl max-h-80 overflow-y-auto z-50"></div>
+    </div>
+    <div id="user-badge" class="flex items-center gap-3"></div>
+  </header>
+  <div class="pt-24 pb-12 px-8 space-y-6">
+    <div class="flex justify-between items-end">
+      <div><h2 class="font-headline text-3xl font-bold">Alerts & Risk Analysis</h2><p class="text-outline mt-1">Real-time AI-driven hazard detection across all active sites.</p></div>
+      <div class="flex gap-3">
+        <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant/30 bg-white rounded-lg font-semibold text-sm hover:bg-[#f2f4f7]">🔽 Filter View</button>
+        <button onclick="alert('CSV export coming soon')" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold text-sm hover:opacity-90">⬇ Export Report</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-6">
+      <div class="glass-card p-6 rounded-xl border-l-4 border-error relative overflow-hidden group hover:-translate-y-1 transition-transform">
+        <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform">❗</div>
+        <p class="text-xs text-error uppercase tracking-wider font-bold">Critical</p>
+        <h3 class="font-headline text-6xl font-bold my-2 leading-none" id="count-critical">0</h3>
+        <p class="text-outline text-sm">Immediate Action Required</p>
+      </div>
+      <div class="glass-card p-6 rounded-xl border-l-4 border-tertiary relative overflow-hidden group hover:-translate-y-1 transition-transform">
+        <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform">⚠️</div>
+        <p class="text-xs text-tertiary uppercase tracking-wider font-bold">High Risk</p>
+        <h3 class="font-headline text-6xl font-bold my-2 leading-none" id="count-high">0</h3>
+        <p class="text-outline text-sm">Escalated Monitoring</p>
+      </div>
+      <div class="glass-card p-6 rounded-xl border-l-4 border-yellow-500 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+        <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform">ℹ️</div>
+        <p class="text-xs text-yellow-600 uppercase tracking-wider font-bold">Medium</p>
+        <h3 class="font-headline text-6xl font-bold my-2 leading-none" id="count-medium">0</h3>
+        <p class="text-outline text-sm">Standard Review Queue</p>
+      </div>
+      <div class="glass-card p-6 rounded-xl border-l-4 border-primary relative overflow-hidden group hover:-translate-y-1 transition-transform">
+        <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform">✅</div>
+        <p class="text-xs text-primary uppercase tracking-wider font-bold">Low Risk</p>
+        <h3 class="font-headline text-6xl font-bold my-2 leading-none" id="count-low">0</h3>
+        <p class="text-outline text-sm">Routine Observations</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+      <div class="col-span-2 bg-white rounded-xl shadow-sm border border-outline-variant/10 overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-outline-variant/10 flex justify-between items-center">
+          <h4 class="font-headline text-sm font-bold flex items-center gap-2">🗺️ Dynamic Risk Heat Map — Central Site</h4>
+          <div class="flex gap-2">
+            <button class="px-3 py-1 bg-[#f2f4f7] text-xs font-bold rounded-full">Zoom: 100%</button>
+            <button class="px-3 py-1 bg-[#f2f4f7] text-xs font-bold rounded-full">Live Feed</button>
+          </div>
+        </div>
+        <div class="relative h-[400px] bg-gray-100">
+          <div class="absolute inset-0 grayscale opacity-40 bg-cover bg-center" style="background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1200&q=70')"></div>
+          <div id="heat-glows"></div>
+          <div id="map-pins"></div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-outline-variant/10 flex flex-col">
+        <div class="p-4 border-b border-outline-variant/10"><h4 class="font-headline text-sm font-bold">Severity Trends</h4></div>
+        <div class="p-6 flex-1 space-y-6">
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs font-bold"><span>Critical Share of Alerts</span><span id="trend-critical-pct" class="text-error">0%</span></div>
+            <div class="h-2 w-full bg-[#f2f4f7] rounded-full overflow-hidden"><div id="trend-critical-bar" class="h-full bg-error rounded-full" style="width:0%"></div></div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs font-bold"><span>High Risk Share</span><span id="trend-high-pct" class="text-tertiary">0%</span></div>
+            <div class="h-2 w-full bg-[#f2f4f7] rounded-full overflow-hidden"><div id="trend-high-bar" class="h-full bg-tertiary rounded-full" style="width:0%"></div></div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs font-bold"><span>Resolution Rate</span><span id="trend-safe-pct" class="text-on-surface-variant">0%</span></div>
+            <div class="h-2 w-full bg-[#f2f4f7] rounded-full overflow-hidden"><div id="trend-safe-bar" class="h-full bg-on-surface-variant rounded-full" style="width:0%"></div></div>
+          </div>
+          <div class="pt-6 mt-2 border-t border-outline-variant/10">
+            <p class="text-[11px] text-outline uppercase tracking-wide mb-3">Primary Hazard Types</p>
+            <div id="hazard-tags" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="alert-sections" class="space-y-4"></div>
+    <div id="alerts-empty" class="hidden text-center py-12 text-outline text-sm">No alerts recorded yet.</div>
+  </div>
+</main>
+<script src="js/api.js"></script><script src="js/auth.js"></script><script src="js/search.js"></script><script src="js/alerts.js"></script>
+</body></html>

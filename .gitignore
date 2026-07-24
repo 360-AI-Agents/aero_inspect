@@ -1,0 +1,15 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Uploaded content — real photos/videos of workers, never commit these
+backend/uploads/evidence/
+backend/uploads/worker_photos/
+backend/uploads/clips/
+backend/uploads/stream/
+backend/uploads/safety_manuals/
+
+# OS files
+.DS_Store
