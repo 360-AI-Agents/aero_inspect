@@ -89,31 +89,36 @@ async function loadLiveStream(cameraId) {
   const placeholder = document.getElementById("live-stream-placeholder");
   const badge = document.getElementById("live-stream-badge");
 
-  if (hlsPlayer) {
-    hlsPlayer.destroy();
-    hlsPlayer = null;
-  }
-  video.classList.add("hidden");
-  badge.classList.add("hidden");
-  badge.classList.remove("flex");
-  placeholder.classList.remove("hidden");
-  placeholder.textContent = "No live stream available for this camera yet";
-
-  if (!cameraId) return;
-
   try {
+    if (hlsPlayer) {
+      hlsPlayer.destroy();
+      hlsPlayer = null;
+    }
+    video.classList.add("hidden");
+    badge.classList.add("hidden");
+    badge.classList.remove("flex");
+    placeholder.classList.remove("hidden");
+    placeholder.textContent = "No live stream available for this camera yet";
+
+    if (!cameraId) return;
+
     const camera = await authFetch(`/cameras/${cameraId}`, "GET");
     const cameraName = camera.camera_name.replace(/\//g, "_").replace(/\\/g, "_");
-    const streamUrl = `${API_BASE}/stream/${cameraName}/stream.m3u8`;
+    const streamUrl = `${API_BASE}/stream/${cameraName}/stream.m3u8?t=${Date.now()}`;
 
-    const checkRes = await fetch(streamUrl, { method: "HEAD" });
+    const checkRes = await fetch(streamUrl, { method: "HEAD", cache: "no-store" });
     if (!checkRes.ok) {
       placeholder.textContent = "No live stream available for this camera yet";
       return;
     }
 
-    if (Hls.isSupported()) {
-      hlsPlayer = new Hls();
+    if (typeof Hls !== "undefined" && Hls.isSupported()) {
+      hlsPlayer = new Hls({
+        liveSyncDurationCount: 3,
+        liveMaxLatencyDurationCount: 6,
+        maxLiveSyncPlaybackRate: 1.5,
+        backBufferLength: 10,
+      });
       hlsPlayer.loadSource(streamUrl);
       hlsPlayer.attachMedia(video);
       hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -124,10 +129,7 @@ async function loadLiveStream(cameraId) {
         video.play().catch(() => {});
       });
       hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
-        if (data.fatal) {
-          console.error("HLS fatal error:", data);
-          placeholder.textContent = "Live stream unavailable right now";
-        }
+        console.warn("HLS non-fatal handled:", data && data.details);
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = streamUrl;
@@ -140,8 +142,8 @@ async function loadLiveStream(cameraId) {
       placeholder.textContent = "Live streaming isn't supported in this browser";
     }
   } catch (err) {
-    console.error("Failed to load live stream:", err);
-    placeholder.textContent = "No live stream available for this camera yet";
+    console.warn("Live stream load issue (non-blocking):", err);
+    placeholder.textContent = "Live stream temporarily unavailable";
   }
 }
 

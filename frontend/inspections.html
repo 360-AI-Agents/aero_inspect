@@ -164,7 +164,7 @@
               </span>
             </div>
             <div class="relative bg-black rounded-lg overflow-hidden aspect-video mb-6">
-              <video id="live-stream-video" autoplay playsinline muted controls class="w-full h-full object-cover"></video>
+              <video id="live-stream-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
               <div id="live-stream-placeholder" class="absolute inset-0 flex items-center justify-center text-white/50 text-xs">
                 No live stream available for this camera yet
               </div>
@@ -228,5 +228,6 @@
 <script src="js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="js/inspections.js"></script>
+<script>window.addEventListener('beforeunload', () => console.trace('PAGE RELOAD TRIGGERED FROM HERE'));</script>
 </body>
 </html>
