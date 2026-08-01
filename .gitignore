@@ -1,15 +1,27 @@
-# Python
+# Python virtual environment -- never commit this, it's machine-specific
+# and huge. Anyone cloning the repo recreates it with requirements.txt.
 venv/
+
+# Python bytecode/cache
 __pycache__/
 *.pyc
+*.pyo
+
+# Editor/OS cruft
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Environment secrets — never commit
 .env
 
-# Uploaded content — real photos/videos of workers, never commit these
+# Uploaded content — real photos/videos of workers, never commit these.
+# NOTE: excluded pending explicit confirmation from Vijay on whether
+# evidence photos should be public. Do not remove this exclusion without
+# that confirmation.
 backend/uploads/evidence/
 backend/uploads/worker_photos/
 backend/uploads/clips/
 backend/uploads/stream/
 backend/uploads/safety_manuals/
-
-# OS files
-.DS_Store
+violations/
