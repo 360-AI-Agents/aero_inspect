@@ -1,0 +1,29 @@
+# Custom ByteTrack config for AeroInspect AI -- based on Ultralytics'
+# bundled default (venv/Lib/site-packages/ultralytics/cfg/trackers/bytetrack.yaml),
+# with ONE change: track_buffer raised from 30 -> 90.
+#
+# Why: ByteTrack's default track_buffer is only 30 frames -- at a typical
+# webcam's ~30fps, that's about ONE SECOND of memory for a "lost" track
+# before it gives up and hands out a brand new ID on reappearance. Any
+# occlusion or brief tracking drop longer than that (someone turning,
+# stepping behind something, a momentary confidence dip) immediately
+# becomes a new raw ID -- which then depends entirely on the app's own
+# spatial ID-stitching (worker_manager.stabilize_worker_ids) to fix, and
+# that stitching has its own limits (see ID_CONTINUITY_MAX_CENTER_DISTANCE
+# in config.py). Raising the buffer to 90 frames (~3s) lets ByteTrack
+# itself hold onto the original ID through most brief real-world
+# occlusions, so fewer new IDs are generated in the first place -- this
+# is a complement to the stitching logic, not a replacement for it.
+#
+# Trade-off: a longer buffer means ByteTrack is more willing to re-attach
+# a reappearing detection to an old track -- which raises the risk of an
+# "ID switch" (attaching the wrong old ID to a genuinely different person
+# who appeared in a similar spot). 90 is a moderate increase, not extreme;
+# watch for that failure mode specifically if two people cross paths.
+tracker_type: bytetrack
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.25
+track_buffer: 90
+match_thresh: 0.8
+fuse_score: True

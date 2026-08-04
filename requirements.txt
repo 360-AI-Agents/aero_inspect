@@ -1,6 +1,14 @@
 ultralytics
-opencv-python
+opencv-contrib-python
 numpy
 fastapi
 uvicorn
 requests
+
+# Face matching (face_id.py) -- ArcFace embeddings via InsightFace,
+# replacing the old LBPH (cv2.face) + Haar cascade approach. Prebuilt
+# wheels on Windows, no CMake/C++ build toolchain needed (unlike
+# dlib-based alternatives). First run downloads the buffalo_l model
+# weights automatically -- needs internet access once.
+insightface
+onnxruntime

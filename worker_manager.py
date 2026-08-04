@@ -48,7 +48,19 @@ def get_workers(results):
             "helmet": False,
             "vest": False,
             "mask": False,
-            "violations": []
+            "violations": [],
+            # Precise on-screen location for each missing-PPE item,
+            # keyed by the SAME violation string calculate_worker_
+            # violations() produces (e.g. "Helmet Missing") -- filled
+            # in by assign_ppe() below ONLY when the model actually
+            # emits a "NO-X" detection inside this worker's real body
+            # region. Best-effort for drawing only: the violation
+            # itself is still decided purely by "no positive PPE
+            # detection found" (see calculate_worker_violations), so a
+            # frame where the model doesn't emit a NO-X box still
+            # counts as a violation -- it just won't have a precise
+            # box to draw that frame, only the outer worker box.
+            "violation_boxes": {}
         }
 
     return workers
@@ -404,6 +416,16 @@ def get_region_box(worker_box, region):
 # nearest worker even when that worker is far away.
 MAX_FALLBACK_DISTANCE = 250
 
+# Maps each "missing PPE" detection class to the SAME violation string
+# calculate_worker_violations() produces -- lets assign_ppe() attach a
+# precise on-screen box to a violation purely for drawing, without
+# changing how the violation itself gets decided.
+NO_LABEL_TO_VIOLATION = {
+    "NO-Hardhat": "Helmet Missing",
+    "NO-Safety Vest": "Safety Vest Missing",
+    "NO-Mask": "Mask Missing",
+}
+
 
 def assign_ppe(results, workers):
     """
@@ -487,6 +509,17 @@ def assign_ppe(results, workers):
 
         elif label == "Mask":
             chosen["mask"] = True
+
+        elif label in NO_LABEL_TO_VIOLATION:
+
+            # A "NO-X" detection landed inside a REAL worker's head/
+            # torso region (same containment logic as the positive
+            # classes above, so this only ever attaches to a confirmed
+            # worker, never background clutter). Record where, so
+            # live_detection.py can draw a precise box instead of just
+            # the outer worker rectangle -- doesn't affect whether
+            # this counts as a violation, only where it gets drawn.
+            chosen["violation_boxes"][NO_LABEL_TO_VIOLATION[label]] = object_box
 
     return workers
 

@@ -217,6 +217,72 @@ def resolve_stale_events(active_worker_ids, timeout_seconds):
     return newly_abandoned
 
 
+def migrate_open_event(old_id, new_id):
+    """
+    If old_id currently has an open violation event, re-key it under
+    new_id instead. Called from face_id.py the moment a worker's face
+    is first matched to a registered identity mid-incident -- so a
+    violation that started under a temporary session ID continues as
+    ONE event under the permanent ID, instead of that session-ID event
+    staying open (and eventually just timing out via
+    resolve_stale_events) while a SECOND, duplicate event opens fresh
+    under the new permanent key for what's really the same incident.
+
+    No-op (returns None) if old_id has no open event. If new_id already
+    has its own open event, this deliberately does NOT merge them --
+    there's no clean way to reconcile two different violation lists/
+    start times, so instead of silently overwriting one, old_id's event
+    is closed out immediately as "abandoned". We know for certain at
+    this point that old_id and new_id are the same real person (that's
+    WHY this function was called), so there's no reason to leave the
+    orphaned event open for up to ID_CONTINUITY_MAX_GAP_SECONDS more --
+    resolve_stale_events() would eventually catch it anyway, this just
+    does it right away and tells the caller so it can be reported to
+    the backend like any other transition, instead of silently aging
+    out later. Returns (event, "abandoned") in that case -- same shape
+    as resolve_stale_events()'s return values -- or None if nothing
+    happened (no open event to migrate, or a clean migrate with nothing
+    extra to report).
+    """
+
+    if old_id not in open_events:
+        return None
+
+    if new_id in open_events:
+
+        now = datetime.now()
+        now_iso = now.isoformat()
+
+        event = open_events.pop(old_id)
+        event["end_time"] = now_iso
+        event["status"] = "abandoned"
+
+        start = datetime.fromisoformat(event["start_time"])
+        event["duration_seconds"] = round((now - start).total_seconds(), 1)
+
+        print(
+            f"[Violations] Worker {old_id} matched to permanent identity "
+            f"{new_id}, but {new_id} already has its own open event -- "
+            f"NOT merged (can't safely reconcile two different start "
+            f"times/violation lists). Closing {old_id}'s event #{event['event_id']} "
+            f"as abandoned right now (confirmed duplicate of the same "
+            f"person) instead of leaving it open to time out later."
+        )
+
+        return event, "abandoned"
+
+    event = open_events.pop(old_id)
+    event["worker_id"] = new_id
+    open_events[new_id] = event
+
+    print(
+        f"[Violations] Migrated open event #{event['event_id']} from "
+        f"worker {old_id} to permanent worker {new_id}."
+    )
+
+    return None
+
+
 def get_worker_event_history(worker_id):
     """All events (open + resolved) ever recorded for this worker."""
     return [e for e in violation_events if e["worker_id"] == worker_id]

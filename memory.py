@@ -46,6 +46,35 @@ def update_worker_presence(worker_id):
     return record
 
 
+def migrate_presence(old_id, new_id):
+    """
+    Move presence tracking from a temporary session ID to a permanent
+    one -- called from face_id.py the moment a worker's face is first
+    matched to a registered identity mid-session. Without this,
+    first_seen/total_frames_seen would restart from zero under the new
+    permanent ID, as if the worker had just walked in, even though
+    they'd already been present (and possibly already confirmed past
+    MIN_CONFIRMATION_FRAMES) under their session ID.
+    """
+
+    if old_id not in worker_presence:
+        return
+
+    old_record = worker_presence.pop(old_id)
+
+    if new_id in worker_presence:
+
+        existing = worker_presence[new_id]
+
+        existing["first_seen"] = min(existing["first_seen"], old_record["first_seen"])
+        existing["last_seen"] = max(existing["last_seen"], old_record["last_seen"])
+        existing["total_frames_seen"] += old_record["total_frames_seen"]
+
+    else:
+
+        worker_presence[new_id] = old_record
+
+
 # ---------------------------------------------------------------
 # Cross-frame ID continuity ("track stitching") -- runtime state only.
 #

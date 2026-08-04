@@ -75,7 +75,7 @@ def save_violation_image(frame, worker_id, bbox, violations, camera_name=CAMERA_
     header_lines = [
         f"Worker ID: {worker_id}",
         f"Camera: {camera_name}",
-        f"Time: {timestamp_display}",
+        f"Start Time: {timestamp_display}",
         f"Violations: {', '.join(violations) if violations else 'None'}"
     ]
 

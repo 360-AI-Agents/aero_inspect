@@ -15,3 +15,9 @@ Thumbs.db
 
 # NOTE: violations/ (evidence photos) and best.pt (model weights) are
 # intentionally NOT ignored -- included in the push per your instruction.
+
+# Live HLS stream output (streaming.py) -- constantly-churning,
+# transient .ts segments + playlist, no archival value like violations/
+# evidence photos have. Regenerated fresh every time live_detection.py
+# runs, so there's nothing worth committing here.
+stream/
