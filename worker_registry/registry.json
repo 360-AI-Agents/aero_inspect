@@ -1,0 +1,29 @@
+{
+  "next_id": 6,
+  "workers": [
+    {
+      "worker_id": 1,
+      "name": "Jatavath Ajay",
+      "photo_path": "worker_registry\\worker_1_jatavath_ajay.jpg",
+      "registered_at": "2026-07-13T00:11:57.064349",
+      "site": "Block A",
+      "camera_name": "Tower Camera 01"
+    },
+    {
+      "worker_id": 2,
+      "name": "Koushik",
+      "photo_path": "worker_registry\\worker_2_koushik.jpg",
+      "registered_at": "2026-07-13T02:20:21.784694",
+      "site": "Block A",
+      "camera_name": "Tower Camera 01"
+    },
+    {
+      "worker_id": 4,
+      "name": "Prasanna",
+      "photo_path": "worker_registry\\worker_4_prasanna.jpg",
+      "registered_at": "2026-07-13T02:38:15.151591",
+      "site": "Block A",
+      "camera_name": "Tower Camera 01"
+    }
+  ]
+}

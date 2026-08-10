@@ -2,6 +2,22 @@ MODEL_PATH = "best.pt"
 
 CAMERA_SOURCE = 0
 
+# ---------------------------------------------------------------
+# Worker Identity (registration.py + face_id.py)
+#
+# registration.py assigns permanent worker IDs (1, 2, 3...) that are
+# meant to persist across restarts/days -- separate from ByteTrack's
+# own session-scoped track IDs (ALSO small increasing integers
+# starting near 1). Those two ID spaces would otherwise collide: a
+# face-matched permanent worker_id=1 could numerically clash with an
+# unrelated ByteTrack session id=1 assigned to a totally different
+# person in the same frame. Offsetting every permanent ID by a large
+# constant before it's used as a `workers` dict key keeps the two
+# namespaces from ever overlapping in practice for a single test
+# session -- e.g. registered worker 1 becomes internal key 100001.
+# ---------------------------------------------------------------
+PERMANENT_ID_OFFSET = 100000
+
 CONFIDENCE = 0.4
 
 # A stricter floor applied only to "Person" detections. A wrong
@@ -11,12 +27,22 @@ CONFIDENCE = 0.4
 # than PPE -- but only slightly. 0.6 was tried and immediately broke
 # a REAL detection at 0.56 confidence (a worker went completely
 # undetected -- worse than any false positive, since a missed real
-# violation beats a phantom one every time). Backed off to 0.45,
-# just above the general CONFIDENCE floor. MIN_CONFIRMATION_FRAMES
-# below is now the PRIMARY defense against transient background
-# false positives -- this confidence floor is a light backstop only,
-# not meant to carry that job alone.
-PERSON_MIN_CONFIDENCE = 0.45
+# violation beats a phantom one every time). Backed off to 0.45.
+#
+# Nudged 0.45 -> 0.50 after real evidence gave an actual number to
+# work with: a hanging jacket on the wall (clothing/fabric clutter,
+# same class of false positive as an earlier stuffed-toy pile) was
+# confidently detected as "Person" at 0.4595 -- just above the old
+# 0.45 floor. 0.50 excludes that specific case while staying a clear
+# 0.06 below the lowest REAL detection ever observed (0.56, the case
+# that broke at 0.6 above), so it shouldn't reintroduce that failure.
+# Not a permanent fix -- another clutter object could still land
+# somewhere in the 0.50-0.56 gap, in which case this is a config
+# value to revisit again from new evidence, not a solved problem.
+# MIN_CONFIRMATION_FRAMES below remains the PRIMARY defense against
+# transient background false positives; this confidence floor is
+# still a backstop, not the main filter.
+PERSON_MIN_CONFIDENCE = 0.50
 
 # How many consecutive frames a worker must be continuously present
 # for before they're allowed to open a violation event (or have
@@ -47,7 +73,87 @@ NMS_IOU_THRESHOLD = 0.35
 
 WINDOW_NAME = "AeroInspect AI"
 
-API_URL = "http://127.0.0.1:8000/api/live_detection"
+# One base URL for the backend -- everything else derives from it, so
+# changing IP/port only ever needs editing this one line.
+BACKEND_BASE_URL = "http://192.168.137.178:8000"
+
+# Main detection report endpoint (JSON only -- no image bytes).
+API_URL = f"{BACKEND_BASE_URL}/api/live_detection/"
+
+# Separate endpoint for the evidence PHOTO itself (multipart file
+# upload), since JSON can't carry raw image bytes cleanly. Only ever
+# called once per violation event, at the moment it opens -- see
+# send_evidence_photo() in backend_client.py.
+EVIDENCE_API_URL = f"{BACKEND_BASE_URL}/api/live_detection/evidence"
+
+# ---------------------------------------------------------------
+# Worker identity now lives entirely on the backend/UI side --
+# registration.py's old local camera-capture flow is no longer used
+# by live_detection.py (see that file's docstring). Instead, face_id.py
+# pulls the current worker roster + reference photos from the first
+# URL below, and reports a confident face match back via the second
+# so the backend can auto-link a tracking ID to a real employee
+# profile instead of an admin doing it by hand.
+# ---------------------------------------------------------------
+REFERENCE_PHOTOS_URL = f"{BACKEND_BASE_URL}/workers/reference-photos/all"
+LINK_TRACKER_URL = f"{BACKEND_BASE_URL}/workers/link-tracker"
+
+# ---------------------------------------------------------------
+# Live HLS Streaming (streaming.py)
+#
+# Milestone 1 of the video-streaming feature agreed with Mahani: an
+# ffmpeg relay producing HLS, fed from a downscaled/throttled COPY of
+# the same frames already captured for YOLO -- never a second camera
+# connection. Same setup works unchanged for today's webcam and next
+# week's RTSP site camera, since either way this only ever sees
+# frames OpenCV already decoded.
+# ---------------------------------------------------------------
+FFMPEG_PATH = "ffmpeg"  # assumes ffmpeg is installed and on PATH
+
+# Display stream is intentionally lower-res/lower-fps than what YOLO
+# analyzes -- the "sub-stream vs main-stream" split real IP cameras
+# already use internally. Detection is completely unaffected by these.
+STREAM_WIDTH = 640
+STREAM_HEIGHT = 360
+STREAM_FPS = 12
+
+HLS_OUTPUT_FOLDER = "stream"
+HLS_SEGMENT_SECONDS = 4    # shorter = lower latency, more file churn
+HLS_PLAYLIST_SIZE = 6      # how many recent segments the .m3u8 keeps listed
+
+# Push endpoint for HLS files -- mirrors EVIDENCE_API_URL's shape
+# (multipart upload) rather than exposing a direct URL on this
+# machine, per the architecture agreed with Mahani: this side pushes,
+# her backend stores/serves. See streaming.py's uploader.
+STREAM_UPLOAD_URL = f"{BACKEND_BASE_URL}/api/live_detection/stream/segment"
+
+# How often the uploader checks HLS_OUTPUT_FOLDER for a new segment or
+# an updated playlist to push. Doesn't need to be faster than
+# HLS_SEGMENT_SECONDS itself -- nothing new to send in between.
+STREAM_UPLOAD_POLL_SECONDS = 1
+
+# ---------------------------------------------------------------
+# Violation Clip Recording (clip_recorder.py)
+#
+# Milestone 2 of the video-streaming feature: a short PRE-ROLL clip
+# captured the instant a violation event opens (same trigger as the
+# single evidence photo), uploaded via Mahani's contract -- worker_id
+# + inspection_id + file, identical shape to evidence photos, matched
+# the same way (using the inspection_id from the SAME report send
+# that carried this event's "opened" transition -- see
+# backend_worker.py). No event_id needed: our own reporting model
+# only ever includes at most one "opened" event per worker per
+# inspection, so worker_id + inspection_id already uniquely resolves.
+# ---------------------------------------------------------------
+CLIP_UPLOAD_URL = f"{BACKEND_BASE_URL}/api/live_detection/clip"
+
+# How many seconds of recent frames to keep buffered, and at what
+# throttled rate -- keeps memory bounded (a few dozen MB) since this
+# buffer runs continuously for the life of the process, not just
+# during a violation.
+CLIP_BUFFER_SECONDS = 8
+CLIP_BUFFER_FPS = 10
+CLIP_FOLDER = "clips"
 
 CAMERA_NAME = "Tower Camera 01"
 
@@ -85,6 +191,15 @@ ENABLE_ROI = True
 # job site is unlikely to have a mirror in frame. Revert this back
 # toward 0.1 (or wherever) once testing somewhere without a mirror.
 ROI = (0.3, 0.05, 0.9, 0.95)
+
+# How much of a worker's OWN box area must fall inside the ROI to
+# count as "in the zone" (roi.py) -- replaced a pure center-point
+# check after a low-confidence, edge-of-frame false-positive detection
+# (mostly outside the zone) still passed because its center alone
+# crept just inside the boundary. 0.5 is a starting point: a box
+# needs at least half its area actually inside to count. Tune from
+# real evidence, same as other thresholds in this app.
+ROI_MIN_OVERLAP_FRACTION = 0.5
 
 SHOW_ZOOM_INSET = True
 ZOOM_FACTOR = 2.0
@@ -124,4 +239,24 @@ ID_CONTINUITY_IOU_THRESHOLD = 0.5
 # Fallback: if boxes don't overlap enough (because the worker moved
 # during the gap), still re-attach if the new box's center is within
 # this many pixels of the vanished worker's last known center.
-ID_CONTINUITY_MAX_CENTER_DISTANCE = 220
+#
+# Widened from 220 -> 350 after real evidence this was too tight: an
+# earlier near-miss failed re-attachment at 219.5px (just under the old
+# threshold), and later the same person was logged as three separate
+# workers (IDs 3, 4, 401) in the live dashboard because reappearing
+# detections kept landing just outside 220px of their last known spot.
+# This is expected to happen more on close-range webcam testing than on
+# a real site camera: at close range, a person taking one step covers a
+# much larger number of PIXELS than the same physical step would on a
+# wide, distant CCTV/drone shot. Revisit this back down once testing
+# with an actual wide-angle site camera, where 220 (or less) may be
+# plenty.
+#
+# Trade-off to watch: widening this raises the risk of the OPPOSITE
+# failure -- a different person who happens to stand within 350px of
+# where the last one vanished could incorrectly inherit their ID. If a
+# future test shows that happening, this is the value to bring back
+# down (paired with the ByteTrack track_buffer increase in
+# bytetrack_custom.yaml, which reduces how often a brand new ID gets
+# generated in the first place).
+ID_CONTINUITY_MAX_CENTER_DISTANCE = 350

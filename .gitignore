@@ -1,5 +1,4 @@
-# Python virtual environment -- never commit this, it's machine-specific
-# and huge. Anyone cloning the repo recreates it with requirements.txt.
+# Python virtual environment -- never commit this
 venv/
 
 # Python bytecode/cache
@@ -12,16 +11,11 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Environment secrets — never commit
+# Environment secrets -- never commit
 .env
 
-# Uploaded content — real photos/videos of workers, never commit these.
-# NOTE: excluded pending explicit confirmation from Vijay on whether
-# evidence photos should be public. Do not remove this exclusion without
-# that confirmation.
-backend/uploads/evidence/
-backend/uploads/worker_photos/
-backend/uploads/clips/
-backend/uploads/stream/
-backend/uploads/safety_manuals/
-violations/
+# Uploaded content -- real photos/videos of workers, never commit these
+# Evidence photos and model weights are intentionally NOT ignored.
+
+# Live HLS stream output -- transient files regenerated during live detection
+stream/

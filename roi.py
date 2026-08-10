@@ -71,35 +71,61 @@ def draw_roi_overlay(frame, roi_pixels, label="Monitoring Zone"):
     return frame
 
 
-def is_inside_roi(bbox, roi_pixels):
+def roi_overlap_fraction(bbox, roi_pixels):
     """
-    True if a worker's box center falls inside the ROI.
-    Using the center (not requiring the full box inside) means a
-    worker standing at the edge of the zone, partially overlapping
-    its boundary, is still counted -- only workers who are clearly
-    elsewhere are excluded.
+    Fraction of a worker's OWN box area that falls inside the ROI --
+    not just whether its center point happens to land there. A box
+    that's mostly outside the zone but whose center barely creeps
+    across the boundary scores a low fraction here, even though a
+    pure center check would have let it straight through.
     """
 
     x1, y1, x2, y2 = bbox
-    cx = (x1 + x2) / 2
-    cy = (y1 + y2) / 2
-
     rx1, ry1, rx2, ry2 = roi_pixels
 
-    return rx1 <= cx <= rx2 and ry1 <= cy <= ry2
+    ix1 = max(x1, rx1)
+    iy1 = max(y1, ry1)
+    ix2 = min(x2, rx2)
+    iy2 = min(y2, ry2)
+
+    intersection = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+    box_area = max(1, (x2 - x1) * (y2 - y1))  # avoid divide-by-zero on a degenerate box
+
+    return intersection / box_area
 
 
-def filter_workers_by_roi(workers, roi_pixels):
+def is_inside_roi(bbox, roi_pixels, min_overlap_fraction=0.5):
     """
-    Keep only workers whose center falls inside the ROI -- e.g. so a
-    person walking past in the background isn't scored for PPE
-    compliance on the actual work platform.
+    True if at least min_overlap_fraction of a worker's box area
+    falls inside the ROI.
+
+    Replaced a pure center-point check with this after real testing:
+    a low-confidence, edge-of-frame false-positive "Person" detection
+    (mostly sitting in background clutter OUTSIDE the monitored zone)
+    still passed the old check, because its center happened to land
+    just inside the boundary even though most of the box didn't.
+    Requiring real overlap -- not just where the midpoint lands --
+    rejects that case, while still keeping a worker genuinely standing
+    at the zone's edge (mostly inside, just brushing the boundary).
+    """
+
+    return roi_overlap_fraction(bbox, roi_pixels) >= min_overlap_fraction
+
+
+def filter_workers_by_roi(workers, roi_pixels, min_overlap_fraction=0.5):
+    """
+    Keep only workers with enough of their box actually inside the
+    ROI -- e.g. so a person (or a false-positive detection) mostly
+    outside the actual work platform isn't scored for PPE compliance
+    on it. min_overlap_fraction is a starting point (see config.py),
+    not a calibrated value -- tune it from real evidence the same way
+    other thresholds in this app have been.
     """
 
     return {
         worker_id: worker
         for worker_id, worker in workers.items()
-        if is_inside_roi(worker["bbox"], roi_pixels)
+        if is_inside_roi(worker["bbox"], roi_pixels, min_overlap_fraction)
     }
 
 

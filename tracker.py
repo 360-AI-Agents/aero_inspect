@@ -17,7 +17,7 @@ def track_objects(model, frame):
     results = model.track(
         frame,
         persist=True,
-        tracker="bytetrack.yaml",
+        tracker="bytetrack_custom.yaml",
         conf=CONFIDENCE,
         iou=NMS_IOU_THRESHOLD,
         verbose=False

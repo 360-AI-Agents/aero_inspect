@@ -1,0 +1,22 @@
+{
+  "Test-01": {
+    "label": 1,
+    "name": "Test worker"
+  },
+  "W-103": {
+    "label": 2,
+    "name": "suresh"
+  },
+  "W-109": {
+    "label": 3,
+    "name": "Mukesh"
+  },
+  "W-104": {
+    "label": 4,
+    "name": "Ajay"
+  },
+  "W-110": {
+    "label": 5,
+    "name": "Rahul"
+  }
+}
