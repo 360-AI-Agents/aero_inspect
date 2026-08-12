@@ -1,0 +1,17 @@
+.git
+.wrangler
+frontend
+datasets
+clips
+violations
+worker_registry
+evidence
+docs
+*.db
+*.pt
+*.xml
+node_modules
+__pycache__
+*.pyc
+.env
+requirements.txt

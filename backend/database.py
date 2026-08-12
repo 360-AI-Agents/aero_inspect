@@ -5,7 +5,9 @@ from sqlalchemy.orm import sessionmaker
 from backend.config import settings
 
 connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
+if settings.DATABASE_URL.startswith("sqlite+d1http"):
+    import backend.db_d1_dialect  # noqa: F401  (registers the dialect)
+elif settings.DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
 
 engine = create_engine(

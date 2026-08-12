@@ -1,0 +1,39 @@
+{
+  "name": "aeroinspect-backend",
+  "main": "workers/src/index.js",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "containers": [
+    {
+      "class_name": "Backend",
+      "image": "ghcr.io/360-ai-agents/aero-inspect-backend:latest",
+      "instance_type": "basic",
+      "max_instances": 1
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "BACKEND",
+        "class_name": "Backend"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Backend"]
+    }
+  ],
+
+  "d1_databases": [
+    {
+      "binding": "aeroinspect_db",
+      "database_name": "aeroinspect-db",
+      "database_id": "0a6173ba-0c25-4dff-88fa-e1f62f80a382"
+    }
+  ]
+}

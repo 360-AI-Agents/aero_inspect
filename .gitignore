@@ -19,3 +19,11 @@ Thumbs.db
 
 # Live HLS stream output -- transient files regenerated during live detection
 stream/
+
+# Node / Wrangler
+node_modules/
+.wrangler/
+package-lock.json
+
+# Local sqlite artifact from running the backend locally
+aeroinspect.db

@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://lovers-cheque-paying-operated.trycloudflare.com";
 
 async function apiGet(path) {
   const res = await fetch(`${API_BASE}${path}`);
