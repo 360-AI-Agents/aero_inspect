@@ -19,8 +19,15 @@ function logout() {
   window.location.href = "login.html";
 }
 
+function getPageName() {
+  // Cloudflare Pages serves clean URLs (login.html -> /login), so pathname
+  // won't always carry the .html suffix -- normalize before comparing.
+  let name = window.location.pathname.split("/").pop() || "index";
+  return name.replace(/\.html$/, "");
+}
+
 function isLoginPage() {
-  return window.location.pathname.endsWith("login.html");
+  return getPageName() === "login";
 }
 
 function requireAuth() {
@@ -95,9 +102,8 @@ function applyRoleVisibility() {
     el.style.display = "none";
   });
 
-  const currentPage = window.location.pathname.split("/").pop();
-  const adminOnlyPages = ["settings.html", "users.html", "safety-management.html"];
-  if (adminOnlyPages.includes(currentPage)) {
+  const adminOnlyPages = ["settings", "users", "safety-management"];
+  if (adminOnlyPages.includes(getPageName())) {
     window.location.href = "index.html";
   }
 }

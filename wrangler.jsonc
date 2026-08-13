@@ -7,7 +7,7 @@
   "containers": [
     {
       "class_name": "Backend",
-      "image": "docker.io/aiagents360/aeroinspect-backend:6c6a19def28dc07d5231cbfa53ade090d615497f",
+      "image": "docker.io/aiagents360/aeroinspect-backend:bbf28f1ec46c5c759f249e6d5f2d1731e1f9f8f3",
       "instance_type": "basic",
       "max_instances": 1
     }

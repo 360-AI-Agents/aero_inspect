@@ -66,8 +66,7 @@ function handleSearchResultClick(item) {
   searchInput.value = "";
 
   if (item.type === "inspection") {
-    const currentPage = window.location.pathname.split("/").pop();
-    if (currentPage === "inspections.html" && typeof openInspectionDetail === "function") {
+    if (getPageName() === "inspections" && typeof openInspectionDetail === "function") {
       const detailPanel = document.getElementById("detail-panel");
       const detailEmpty = document.getElementById("detail-empty");
       if (detailPanel) detailPanel.style.display = "none";
