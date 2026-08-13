@@ -103,10 +103,12 @@ class Cursor:
         self._rowindex = 0
         self.arraysize = 1
 
+    _ROWS_RETURNING = ("SELECT", "PRAGMA", "WITH", "EXPLAIN")
+
     def execute(self, sql, params=None):
         params = list(params) if params else []
         data = _post({"sql": sql, "params": params})
-        self._load_result(data)
+        self._load_result(data, sql)
         return self
 
     def executemany(self, sql, seq_of_params):
@@ -115,20 +117,27 @@ class Cursor:
             return self
         data = _post({"batch": batch})
         last = data.get("batch", [{}])[-1]
-        self._load_result({"results": last.get("results", []), "meta": last.get("meta", {})})
+        self._load_result({"results": last.get("results", []), "meta": last.get("meta", {})}, sql)
         return self
 
-    def _load_result(self, data):
+    def _load_result(self, data, sql=""):
         results = data.get("results") or []
         meta = data.get("meta") or {}
 
         self._rows = [tuple(row.values()) for row in results]
         self._rowindex = 0
-        self.description = (
-            [(k, None, None, None, None, None, None) for k in results[0].keys()]
-            if results
-            else None
-        )
+
+        if results:
+            # A statement that returned rows: description comes from them.
+            self.description = [(k, None, None, None, None, None, None) for k in results[0].keys()]
+        elif sql.lstrip().upper().startswith(self._ROWS_RETURNING):
+            # A rows-returning statement that just matched nothing -- an
+            # empty column list still signals "this is a SELECT" to
+            # SQLAlchemy, vs. None which means "this was DML/DDL".
+            self.description = []
+        else:
+            self.description = None
+
         self.rowcount = meta.get("changes", len(self._rows) or -1)
         self.lastrowid = meta.get("last_row_id")
 

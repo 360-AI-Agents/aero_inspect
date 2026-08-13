@@ -41,5 +41,15 @@ class D1Dialect(SQLiteDialect):
     def set_isolation_level(self, dbapi_connection, level):
         pass
 
+    # has_table() (used by create_all's checkfirst) normally runs
+    # `PRAGMA table_info(...)`, which D1 also rejects. sqlite_master is a
+    # plain table, not a PRAGMA, so query it directly instead.
+    def has_table(self, connection, table_name, schema=None, **kw):
+        result = connection.exec_driver_sql(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+            (table_name,),
+        )
+        return result.first() is not None
+
 
 registry.register("sqlite.d1http", "backend.db_d1_dialect", "D1Dialect")
