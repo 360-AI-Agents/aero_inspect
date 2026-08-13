@@ -25,5 +25,14 @@ class D1Dialect(SQLiteDialect):
     def is_disconnect(self, e, connection, cursor):
         return False
 
+    # D1 rejects `PRAGMA read_uncommitted` (used by the base sqlite dialect
+    # to detect/set isolation level) with "not authorized: SQLITE_AUTH", so
+    # skip the PRAGMA round-trip entirely and report a fixed level.
+    def get_isolation_level(self, dbapi_connection):
+        return "SERIALIZABLE"
+
+    def set_isolation_level(self, dbapi_connection, level):
+        pass
+
 
 registry.register("sqlite.d1http", "backend.db_d1_dialect", "D1Dialect")
