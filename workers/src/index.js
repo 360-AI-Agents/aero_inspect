@@ -37,9 +37,24 @@ async function runD1(request, workerEnv) {
 
     const stmt = db.prepare(body.sql).bind(...sanitize(body.params));
     const result = await stmt.all();
+    const results = result.results || [];
+
+    // D1's meta has no column info, and a SELECT matching zero rows gives
+    // us nothing to infer column names from. Re-running as a read-only
+    // .raw({columnNames:true}) call is safe (no side effects) and gets us
+    // the real column list even with no matching rows, which SQLAlchemy's
+    // ORM needs to distinguish "0 rows" from "not a rows-returning
+    // statement" and to build its row processor before it knows row count.
+    let columns = null;
+    if (results.length === 0 && /^\s*(SELECT|PRAGMA|WITH|EXPLAIN)/i.test(body.sql)) {
+      const raw = await stmt.raw({ columnNames: true });
+      columns = raw[0] || [];
+    }
+
     return json({
       ok: true,
-      results: result.results || [],
+      results,
+      columns,
       meta: {
         changes: result.meta?.changes,
         last_row_id: result.meta?.last_row_id,

@@ -127,9 +127,15 @@ class Cursor:
         self._rows = [tuple(row.values()) for row in results]
         self._rowindex = 0
 
+        columns = data.get("columns")
+
         if results:
             # A statement that returned rows: description comes from them.
             self.description = [(k, None, None, None, None, None, None) for k in results[0].keys()]
+        elif columns is not None:
+            # Zero-row SELECT: the Worker did a follow-up columnNames-only
+            # call to tell us the real columns (see workers/src/index.js).
+            self.description = [(k, None, None, None, None, None, None) for k in columns]
         elif sql.lstrip().upper().startswith(self._ROWS_RETURNING):
             # A rows-returning statement that just matched nothing -- an
             # empty column list still signals "this is a SELECT" to
