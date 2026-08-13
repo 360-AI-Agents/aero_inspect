@@ -73,7 +73,9 @@ def run_hourly_digest_job():
 
 @app.on_event("startup")
 def on_startup():
-    Base.metadata.create_all(bind=engine)
+    # TEMP DEBUG: skip create_all to isolate whether D1 outbound calls
+    # during startup are what's blocking the container from becoming ready.
+    # Base.metadata.create_all(bind=engine)
     os.makedirs("backend/uploads/evidence", exist_ok=True)
     os.makedirs("backend/uploads/worker_photos", exist_ok=True)
     os.makedirs("backend/uploads/clips", exist_ok=True)
