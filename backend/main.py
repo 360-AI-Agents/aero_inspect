@@ -73,9 +73,7 @@ def run_hourly_digest_job():
 
 @app.on_event("startup")
 def on_startup():
-    # TEMP DEBUG: skip create_all to isolate whether D1 outbound calls
-    # during startup are what's blocking the container from becoming ready.
-    # Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     os.makedirs("backend/uploads/evidence", exist_ok=True)
     os.makedirs("backend/uploads/worker_photos", exist_ok=True)
     os.makedirs("backend/uploads/clips", exist_ok=True)
@@ -88,21 +86,6 @@ def on_startup():
 @app.on_event("shutdown")
 def on_shutdown():
     scheduler.shutdown()
-
-
-@app.get("/debug/d1")
-def debug_d1():
-    # TEMP DEBUG: exercise the D1 outbound proxy path on demand instead of
-    # at startup, so a failure here doesn't block the container from booting.
-    import time
-    from backend import db_d1
-
-    t0 = time.time()
-    try:
-        data = db_d1._post({"sql": "SELECT 1 AS ok"})
-        return {"success": True, "elapsed": time.time() - t0, "data": data}
-    except Exception as e:
-        return {"success": False, "elapsed": time.time() - t0, "error": repr(e)}
 
 
 app.mount("/evidence", StaticFiles(directory="backend/uploads/evidence"), name="evidence")
