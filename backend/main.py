@@ -90,6 +90,21 @@ def on_shutdown():
     scheduler.shutdown()
 
 
+@app.get("/debug/d1")
+def debug_d1():
+    # TEMP DEBUG: exercise the D1 outbound proxy path on demand instead of
+    # at startup, so a failure here doesn't block the container from booting.
+    import time
+    from backend import db_d1
+
+    t0 = time.time()
+    try:
+        data = db_d1._post({"sql": "SELECT 1 AS ok"})
+        return {"success": True, "elapsed": time.time() - t0, "data": data}
+    except Exception as e:
+        return {"success": False, "elapsed": time.time() - t0, "error": repr(e)}
+
+
 app.mount("/evidence", StaticFiles(directory="backend/uploads/evidence"), name="evidence")
 app.mount("/worker_photos", StaticFiles(directory="backend/uploads/worker_photos"), name="worker_photos")
 app.mount("/clips", StaticFiles(directory="backend/uploads/clips"), name="clips")
