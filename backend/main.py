@@ -71,9 +71,19 @@ def run_hourly_digest_job():
     finally:
         db.close()
 
+_startup_error = None
+
+
 @app.on_event("startup")
 def on_startup():
-    Base.metadata.create_all(bind=engine)
+    global _startup_error
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        import traceback
+        _startup_error = traceback.format_exc()
+        print(f"[startup] create_all failed: {e}")
+
     os.makedirs("backend/uploads/evidence", exist_ok=True)
     os.makedirs("backend/uploads/worker_photos", exist_ok=True)
     os.makedirs("backend/uploads/clips", exist_ok=True)
@@ -86,6 +96,11 @@ def on_startup():
 @app.on_event("shutdown")
 def on_shutdown():
     scheduler.shutdown()
+
+
+@app.get("/debug/startup_error")
+def debug_startup_error():
+    return {"error": _startup_error}
 
 
 app.mount("/evidence", StaticFiles(directory="backend/uploads/evidence"), name="evidence")
