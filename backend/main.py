@@ -73,7 +73,8 @@ def run_hourly_digest_job():
 
 @app.on_event("startup")
 def on_startup():
-    Base.metadata.create_all(bind=engine)
+    # TEMP DEBUG: skip create_all at boot (see /debug/create_all) so a
+    # failure surfaces as an HTTP response instead of crashing the container.
     os.makedirs("backend/uploads/evidence", exist_ok=True)
     os.makedirs("backend/uploads/worker_photos", exist_ok=True)
     os.makedirs("backend/uploads/clips", exist_ok=True)
@@ -86,6 +87,16 @@ def on_startup():
 @app.on_event("shutdown")
 def on_shutdown():
     scheduler.shutdown()
+
+
+@app.get("/debug/create_all")
+def debug_create_all():
+    try:
+        Base.metadata.create_all(bind=engine)
+        return {"success": True}
+    except Exception as e:
+        import traceback
+        return {"success": False, "error": repr(e), "traceback": traceback.format_exc()}
 
 
 app.mount("/evidence", StaticFiles(directory="backend/uploads/evidence"), name="evidence")
